@@ -1,0 +1,84 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="shortcut icon" href="img/azure.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="contenedor">
+        <div class="formulario">
+            <h2>Inicio de Sesión</h2>
+            <p>Ingrese su usuario y contraseña.</p>
+            <form id="loginForm">
+                <label for="username">Usuario<span>*</span></label>
+                <br>
+                <input type="text" id="username" name="username" class="campos" placeholder="Usuario" required>
+                <br>
+                <label for="password">Contraseña<span>*</span></label>
+                <br>
+                <input type="password" id="password" name="password" class="campos" placeholder="Contraseña" required>
+                <br>
+                <button type="button" class="boton" onclick="login()">Iniciar Sesión</button>
+            </form>
+        </div>
+        <div id="userDetails" class="hidden">
+            <h2>Bienvenido</h2>
+            <img id="userPhoto" alt="Foto del Usuario" style="width: 100px; height: 100px; border-radius: 50%;">
+            <p id="userName"></p>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            const apiUrl = 'https://logapi.azurewebsites.net/api/funcioncrud?';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        response.json().then(data => {
+                            mostrarUsuario(data);
+                        }).catch(error => {
+                            console.error('Error al analizar JSON:', error);
+                            alert('Error al procesar los datos');
+                        });
+                    } else {
+                        alert('Usuario o contraseña incorrectos');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al iniciar sesión');
+                });
+        }
+
+        function mostrarUsuario(data) {
+            const userDetailsDiv = document.getElementById('userDetails');
+            const userName = document.getElementById('userName');
+            const userPhoto = document.getElementById('userPhoto');
+
+            userName.textContent = `${data.nombre} ${data.apellido}`;
+            userPhoto.src = data.foto;
+
+            userDetailsDiv.classList.remove('hidden');
+        }
+    </script>
+
+</body>
+
+</html>
